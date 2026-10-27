@@ -752,3 +752,4 @@ def build_gost_report_lr2():
 
 if __name__ == '__main__':
     build_gost_report_lr2()
+

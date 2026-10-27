@@ -458,3 +458,4 @@ def generate_diagram_a0(output_path='idef0_a0.png'):
 if __name__ == '__main__':
     generate_diagram_a_minus_0('idef0_a_minus_0.png')
     generate_diagram_a0('idef0_a0.png')
+
