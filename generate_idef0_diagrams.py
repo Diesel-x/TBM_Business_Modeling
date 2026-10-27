@@ -52,7 +52,7 @@ def draw_idef0_frame(ax, node="A-0", title="Выполнить розничну�
     ax.text(89.0, 4.0, f'CONTEXT:\n{context}', fontsize=9, color='#0F172A', weight='bold', va='center')
 
 
-def draw_arrow(ax, points, label="", label_pos=None, icom="", ha='center', va='center', 
+def draw_arrow(ax, points, label="", label_pos=None, icom="", icom_pos=None, ha='center', va='center', 
                color='#0F172A', lw=1.5, fontsize=8.2, label_bg=True, label_offset=(0,0),
                draw_arrowhead=True):
     """Отрисовка ортогональной стрелки с изломами и стрелочным наконечником"""
@@ -77,23 +77,29 @@ def draw_arrow(ax, points, label="", label_pos=None, icom="", ha='center', va='c
     
     # Отрисовка метки ICOM на старте/конце стрелки
     if icom:
-        start_pt = points[0]
-        dx = points[1][0] - points[0][0]
-        dy = points[1][1] - points[0][1]
-        
-        icom_x, icom_y = start_pt[0], start_pt[1]
-        if dx > 0: # слева направо
-            icom_x += 0.8
-            icom_y += 1.0
-        elif dx < 0: # справа налево
-            icom_x -= 0.8
-            icom_y += 1.0
-        elif dy > 0: # снизу вверх
-            icom_x += 1.0
-            icom_y += 0.8
-        elif dy < 0: # сверху вниз
-            icom_x += 1.0
-            icom_y -= 0.8
+        if icom_pos is not None:
+            icom_x, icom_y = icom_pos
+        elif icom.startswith('O') and len(points) > 1 and points[-1][0] >= 90:
+            icom_x = points[-1][0] - 2.2
+            icom_y = points[-1][1] + 1.1
+        else:
+            start_pt = points[0]
+            dx = points[1][0] - points[0][0]
+            dy = points[1][1] - points[0][1]
+            
+            icom_x, icom_y = start_pt[0], start_pt[1]
+            if dx > 0: # слева направо
+                icom_x += 0.8
+                icom_y += 1.0
+            elif dx < 0: # справа налево
+                icom_x -= 0.8
+                icom_y += 1.0
+            elif dy > 0: # снизу вверх
+                icom_x += 1.0
+                icom_y += 0.8
+            elif dy < 0: # сверху вниз
+                icom_x += 1.0
+                icom_y -= 0.8
             
         ax.text(icom_x, icom_y, icom, fontsize=8, color='#0369A1', weight='bold',
                 bbox=dict(boxstyle='square,pad=0.15', facecolor='#F0F9FF', edgecolor='#BAE6FD', lw=0.8),
@@ -329,8 +335,8 @@ def generate_diagram_a0(output_path='idef0_a0.png'):
     # ---------------- УПРАВЛЕНИЯ (CONTROLS, СВЕРХУ) ----------------
     # C1: Закон РФ «О защите прав потребителей» -> A1 и A4
     draw_arrow(ax, [(14.0, 92.5), (14.0, a1_y + bh)], 
-               label='Закон «О защите прав\nпотребителей»', label_pos=(14.0, 88.0), 
-               icom='C1', fontsize=7.2)
+               label='Закон «О защите прав\nпотребителей»', label_pos=(14.0, 89.2), 
+               icom='C1', fontsize=6.8)
     # Ветвление C1 к A4: идет в высшем коридоре Y=85.0
     draw_arrow(ax, [(14.0, 85.0), (62.0, 85.0), (62.0, a4_y + bh)], 
                label='', draw_arrowhead=True)
@@ -338,8 +344,8 @@ def generate_diagram_a0(output_path='idef0_a0.png'):
     
     # C2: Правила торговли товарами -> A1 и A2
     draw_arrow(ax, [(17.5, 92.5), (17.5, a1_y + bh)], 
-               label='Правила торговли\nтоварами', label_pos=(17.5, 88.0), 
-               icom='C2', fontsize=7.2)
+               label='Правила торговли\nтоварами', label_pos=(17.5, 87.2), 
+               icom='C2', fontsize=6.8)
     # Ветвление C2 к A2: коридор Y=83.5
     draw_arrow(ax, [(17.5, 83.5), (30.0, 83.5), (30.0, a2_y + bh)], 
                label='', draw_arrowhead=True)
@@ -347,8 +353,8 @@ def generate_diagram_a0(output_path='idef0_a0.png'):
     
     # C3: Прейскурант (ценники) -> A1
     draw_arrow(ax, [(20.5, 92.5), (20.5, a1_y + bh)], 
-               label='Прейскурант\n(ценники)', label_pos=(20.5, 88.0), 
-               icom='C3', fontsize=7.2)
+               label='Прейскурант\n(ценники)', label_pos=(20.5, 89.2), 
+               icom='C3', fontsize=6.8, ha='left', label_offset=(0.6, 0))
     
     # C4: Должностные инструкции и кассовая дисциплина -> A2, A3, A4, A5
     draw_arrow(ax, [(33.0, 92.5), (33.0, a2_y + bh)], 
@@ -363,7 +369,7 @@ def generate_diagram_a0(output_path='idef0_a0.png'):
                label='', draw_arrowhead=True)
     ax.scatter([46.5], [56.0], color='#0F172A', s=16, zorder=7)
     # Ветвление C4 к A5:
-    draw_arrow(ax, [(65.0, 42.0), (84.0, 42.0), (84.0, a5_y + bh)], 
+    draw_arrow(ax, [(65.0, 42.0), (80.5, 42.0), (80.5, a5_y + bh)], 
                label='', draw_arrowhead=True)
     ax.scatter([65.0], [42.0], color='#0F172A', s=16, zorder=7)
     
@@ -375,8 +381,8 @@ def generate_diagram_a0(output_path='idef0_a0.png'):
     # ---------------- МЕХАНИЗМЫ (MECHANISMS, СНИЗУ) ----------------
     # M1: Кассир-продавец -> A2, A3, A4
     draw_arrow(ax, [(29.0, 6.5), (29.0, a2_y)], 
-               label='Кассир-продавец', label_pos=(29.0, 10.5), 
-               icom='M1', fontsize=7.2, ha='right', label_offset=(-0.6, 0))
+               label='Кассир-продавец', label_pos=(29.0, 11.0), 
+               icom='M1', fontsize=7.2, ha='right', label_offset=(-0.8, 0))
     # Ветвление M1 к A3:
     draw_arrow(ax, [(29.0, 26.0), (45.5, 26.0), (45.5, a3_y)], 
                label='', draw_arrowhead=True)
@@ -388,13 +394,13 @@ def generate_diagram_a0(output_path='idef0_a0.png'):
     
     # M2: Сканер штрихкодов -> A2
     draw_arrow(ax, [(32.0, 6.5), (32.0, a2_y)], 
-               label='Сканер штрихкодов', label_pos=(32.0, 15.5), 
-               icom='M2', fontsize=7.2, ha='right', label_offset=(-0.6, 0))
+               label='Сканер\nштрихкодов', label_pos=(32.0, 18.0), 
+               icom='M2', fontsize=7.0, ha='right', label_offset=(-0.8, 0))
     
     # M3: POS-терминал с фискальным регистратором -> A2, A3, A4
     draw_arrow(ax, [(35.5, 6.5), (35.5, a2_y)], 
-               label='POS-терминал\nс фискальным рег.', label_pos=(35.5, 10.5), 
-               icom='M3', fontsize=7.2)
+               label='POS-терминал\nс фискальным рег.', label_pos=(35.5, 11.0), 
+               icom='M3', fontsize=7.0, ha='left', label_offset=(0.8, 0))
     # Ветвление M3 к A3:
     draw_arrow(ax, [(35.5, 23.0), (49.5, 23.0), (49.5, a3_y)], 
                label='', draw_arrowhead=True)
@@ -426,28 +432,28 @@ def generate_diagram_a0(output_path='idef0_a0.png'):
     # ---------------- ВЫХОДЫ (OUTPUTS, СПРАВА) ----------------
     # O3: Банковский слип-чек (из A3)
     draw_arrow(ax, [(a3_x + bw, 49.0), (96.5, 49.0)], 
-               label='Банковский слип-чек', label_pos=(88.5, 50.2), 
-               icom='O3', fontsize=7.8)
+               label='Банковский слип-чек', label_pos=(86.0, 50.2), 
+               icom='O3', fontsize=7.5)
     
     # O4: Кассовая выручка (из A3)
     draw_arrow(ax, [(a3_x + bw, 46.0), (96.5, 46.0)], 
-               label='Кассовая выручка (в денежном ящике / на счете)', label_pos=(88.5, 44.8), 
-               icom='O4', fontsize=7.8)
+               label='Кассовая выручка (в кассе / на счете)', label_pos=(86.0, 44.8), 
+               icom='O4', fontsize=7.5)
     
     # O1: Приобретенный товар у покупателя (из A4)
     draw_arrow(ax, [(a4_x + bw, 34.5), (96.5, 34.5)], 
-               label='Приобретенный товар у покупателя', label_pos=(88.5, 35.7), 
-               icom='O1', fontsize=7.8)
+               label='Приобретенный товар\nу покупателя', label_pos=(88.5, 36.0), 
+               icom='O1', fontsize=7.5)
     
     # O2: Фискальный кассовый чек (из A4)
     draw_arrow(ax, [(a4_x + bw, 31.0), (96.5, 31.0)], 
-               label='Фискальный кассовый чек', label_pos=(88.5, 29.8), 
-               icom='O2', fontsize=7.8)
+               label='Фискальный кассовый чек', label_pos=(86.0, 29.8), 
+               icom='O2', fontsize=7.5)
     
     # O5: Отчет об остатках и продажах (из A5)
     draw_arrow(ax, [(a5_x + bw, 16.5), (96.5, 16.5)], 
-               label='Отчет об остатках и продажах', label_pos=(92.5, 17.7), 
-               icom='O5', fontsize=7.8)
+               label='Отчет об остатках и продажах', label_pos=(90.0, 17.7), 
+               icom='O5', fontsize=7.5)
     
     plt.tight_layout()
     fig.savefig(output_path, dpi=300, bbox_inches='tight')
