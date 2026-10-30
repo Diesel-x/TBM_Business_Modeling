@@ -138,17 +138,23 @@ def build_gost_report_lr2():
     sec_title.left_margin = Inches(30 / 25.4)
     sec_title.right_margin = Inches(15 / 25.4)
 
-    # Заполняем титульный лист актуальными данными студента Баянова Д. (гр. 209 БЗУ)
+    # Заполняем титульный лист данными мини-группы 1 (студенты гр. ПИ-209Бзу и ПИ-208Бзу)
     for p in doc.paragraphs:
         if 'Мини-группа' in p.text:
-            p.text = ''
+            p.text = 'Мини-группа-1'
+            p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            for r in p.runs:
+                r.font.name = 'Times New Roman'
+                r.font.size = Pt(14)
         elif 'Выполнили: студенты гр.Группа' in p.text:
-            p.text = '                                                   Выполнил: студент гр. 209 БЗУ'
+            p.text = 'Выполнили: студенты гр. ПИ-209Бзу, ПИ-208Бзу'
+            p.alignment = WD_ALIGN_PARAGRAPH.RIGHT
             for r in p.runs:
                 r.font.name = 'Times New Roman'
                 r.font.size = Pt(12)
         elif 'Фамилия И.О. всех студентов мини-группы' in p.text:
-            p.text = '                                                   Баянов Д.'
+            p.text = 'Ардаширов Э.Ф.\nБайгускаров Т.Р.\nБаянов Д.Г.'
+            p.alignment = WD_ALIGN_PARAGRAPH.RIGHT
             for r in p.runs:
                 r.font.name = 'Times New Roman'
                 r.font.size = Pt(12)
@@ -735,20 +741,21 @@ def build_gost_report_lr2():
         r.font.size = Pt(14)
 
     # Сохранение отчета
-    candidates = ['Отчет_ЛР2_ТБМ_ГОСТ.docx', 'Отчет_ЛР2_ТБМ.docx', 'Отчет_ЛР2_ТБМ_ГОСТ_обновленный.docx']
-    saved = False
-    for path in candidates:
+    save_targets = [
+        'Отчет_ЛР2_ТБМ_ГОСТ.docx',
+        'ЛР2_ПИ209бзу_1_Ардаширов_Байгускаров_Баянов.docx',
+        'ЛР2_ПИ208бзу_1_Ардаширов_Байгускаров_Баянов.docx',
+        os.path.join('МАТЕРИАЛЫ_ДЛЯ_СДАЧИ_ТБМ', '2_Лабораторная_работа_2_IDEF0', 'Отчет_ЛР2_ТБМ_ГОСТ.docx'),
+        os.path.join('МАТЕРИАЛЫ_ДЛЯ_СДАЧИ_ТБМ', '2_Лабораторная_работа_2_IDEF0', 'ЛР2_ПИ209бзу_1_Ардаширов_Байгускаров_Баянов.docx'),
+        os.path.join('МАТЕРИАЛЫ_ДЛЯ_СДАЧИ_ТБМ', '2_Лабораторная_работа_2_IDEF0', 'ЛР2_ПИ208бзу_1_Ардаширов_Байгускаров_Баянов.docx')
+    ]
+    for target in save_targets:
+        os.makedirs(os.path.dirname(os.path.abspath(target)), exist_ok=True)
         try:
-            doc.save(path)
-            print(f'GOST 7.32 Lab 2 report successfully saved: {path}')
-            saved = True
-            break
+            doc.save(target)
+            print(f'GOST Lab 2 report saved: {target}')
         except PermissionError:
-            print(f'File {path} is currently open in Word. Trying next candidate...')
-    if not saved:
-        fallback = 'Отчет_ЛР2_ТБМ_ГОСТ_v2.docx'
-        doc.save(fallback)
-        print(f'Saved to fallback: {fallback}')
+            print(f'Warning: {target} is currently locked by Word.')
 
 if __name__ == '__main__':
     build_gost_report_lr2()

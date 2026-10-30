@@ -154,14 +154,20 @@ def build_gost_report_pr1_3():
 
     for p in doc.paragraphs:
         if 'Мини-группа' in p.text:
-            p.text = ''
+            p.text = 'Мини-группа-1'
+            p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            for r in p.runs:
+                r.font.name = 'Times New Roman'
+                r.font.size = Pt(14)
         elif 'Выполнили: студенты гр.Группа' in p.text:
-            p.text = '                                                   Выполнил: студент гр. 209 БЗУ'
+            p.text = 'Выполнили: студенты гр. ПИ-209Бзу, ПИ-208Бзу'
+            p.alignment = WD_ALIGN_PARAGRAPH.RIGHT
             for r in p.runs:
                 r.font.name = 'Times New Roman'
                 r.font.size = Pt(12)
         elif 'Фамилия И.О. всех студентов мини-группы' in p.text:
-            p.text = '                                                   Баянов Д.'
+            p.text = 'Ардаширов Э.Ф.\nБайгускаров Т.Р.\nБаянов Д.Г.'
+            p.alignment = WD_ALIGN_PARAGRAPH.RIGHT
             for r in p.runs:
                 r.font.name = 'Times New Roman'
                 r.font.size = Pt(12)
@@ -524,14 +530,21 @@ def build_gost_report_pr1_3():
         r.font.size = Pt(14)
 
     # Сохранение отчета
-    output_path = 'Отчет_ПР1-3_ТБМ_ГОСТ.docx'
-    try:
-        doc.save(output_path)
-        print(f'GOST 7.32 PR 1-3 report successfully saved: {output_path}')
-    except PermissionError:
-        fallback = 'Отчет_ПР1-3_ТБМ_ГОСТ_v2.docx'
-        doc.save(fallback)
-        print(f'Saved to fallback: {fallback}')
+    save_targets = [
+        'Отчет_ПР1-3_ТБМ_ГОСТ.docx',
+        'ПР1-3_ПИ209бзу_1_Ардаширов_Байгускаров_Баянов.docx',
+        'ПР1-3_ПИ208бзу_1_Ардаширов_Байгускаров_Баянов.docx',
+        os.path.join('МАТЕРИАЛЫ_ДЛЯ_СДАЧИ_ТБМ', '3_Практические_работы_1-3_Bizagi_BPMN', 'Отчет_ПР1-3_ТБМ_ГОСТ.docx'),
+        os.path.join('МАТЕРИАЛЫ_ДЛЯ_СДАЧИ_ТБМ', '3_Практические_работы_1-3_Bizagi_BPMN', 'ПР1-3_ПИ209бзу_1_Ардаширов_Байгускаров_Баянов.docx'),
+        os.path.join('МАТЕРИАЛЫ_ДЛЯ_СДАЧИ_ТБМ', '3_Практические_работы_1-3_Bizagi_BPMN', 'ПР1-3_ПИ208бзу_1_Ардаширов_Байгускаров_Баянов.docx')
+    ]
+    for target in save_targets:
+        os.makedirs(os.path.dirname(os.path.abspath(target)), exist_ok=True)
+        try:
+            doc.save(target)
+            print(f'GOST PR 1-3 report saved: {target}')
+        except PermissionError:
+            print(f'Warning: {target} is currently locked by Word.')
 
 if __name__ == '__main__':
     build_gost_report_pr1_3()
